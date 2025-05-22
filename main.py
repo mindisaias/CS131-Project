@@ -14,11 +14,18 @@ class LEDController:
         print(f"[LED] Brightness set to: {level}%")
 
 class CloudDatabase:
+    def __init__(self):
+        self.logs = []  # Stores in memory
+
     def log_event(self, data: dict):
+        self.logs.append(data)
         print(f"[Cloud] Logged: {data}")
         
     def fetch_config(self):
         return {"min_brightness": 10, "max_brightness": 100}
+        
+    def get_logs(self):
+        return self.logs
 
 class LightingSystem:
     def __init__(self):
@@ -36,6 +43,7 @@ class LightingSystem:
 
         #"Active" if motion within last 5 minutes
         active = datetime.now() - self.last_motion_time < timedelta(minutes=5)
+        user_count = self.light_sensor.count_users()
 
         if user_count == 0 or not active:
             brightness = 0
@@ -54,6 +62,12 @@ class LightingSystem:
 
 if __name__ == "__main__":
     system = LightingSystem()
-    while True:
+    for _ in range(3):  # Run 3 evaluations, 5 seconds apart
         system.evaluate()
         time.sleep(5)
+
+    print("\n[TEST] Fetching logs from CloudDatabase:")
+    logs = system.cloud_db.get_logs()
+    for log in logs:
+        print(log)
+
