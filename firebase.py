@@ -16,9 +16,15 @@ data = {
 }
 
 #Real Time Data
-db.reference('current_data').set(data)
+try:
+    db.reference('current_data').set(data)
+except Exception as e:
+    print(f"[Firebase Error] {e}")
 
 #Logs
-db.reference('logs').push(data)
+try:
+    db.reference('logs').push(data)
+except Exception as e:
+    print(f"[Firebase Error] {e}")
 
 print("Data pushed to Firebase!")
