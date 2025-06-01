@@ -66,7 +66,9 @@
         const ledEl = document.getElementById('led');
         const colorEl = document.getElementById('color');
         const timestampEl = document.getElementById('timestamp');
+        const dateInput = document.getElementById('logDate');
 
+        // Real-time data
         firebase.database().ref('/sensor_data').on('value', (snapshot) => {
           const data = snapshot.val();
           if (data) {
@@ -79,56 +81,10 @@
             motionEl.textContent = 'No data';
           }
         });
-        const today = new Date().toISOString().split('T')[0];
-        firebase.database().ref(`/logs/${today}`).once('value').then(snapshot => {
-          const logs = snapshot.val();
-          if (!logs) return;
 
-          const timestamps = [];
-          const luxValues = [];
-
-          for (const key in logs) {
-            const entry = logs[key];
-            timestamps.push(entry.timestamp || "N/A");
-            luxValues.push(entry.lux || 0);
-          }
-
-          const ctx = document.getElementById('luxChart').getContext('2d');
-          new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: timestamps,
-              datasets: [{
-                label: 'Ambient Lux',
-                data: luxValues,
-                borderColor: 'blue',
-                backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                fill: true,
-                tension: 0.3
-              }]
-            },
-            options: {
-              responsive: true,
-              scales: {
-                x: {
-                  title: {
-                    display: true,
-                    text: 'Time'
-                  }
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: 'Lux (Brightness)'
-                  },
-                  beginAtZero: true
-                }
-              }
-            }
-          });
-        });
+        // Function to load logs for a given date
         function loadLogs() {
-          const selectedDate = document.getElementById('logDate').value;
+          const selectedDate = dateInput.value;
           if (!selectedDate) return;
 
           firebase.database().ref(`/logs/${selectedDate}`).once('value').then(snapshot => {
@@ -146,7 +102,7 @@
 
             const ctx = document.getElementById('luxChart').getContext('2d');
             if (window.luxChartInstance) {
-              window.luxChartInstance.destroy(); // Clear previous chart
+              window.luxChartInstance.destroy();
             }
 
             window.luxChartInstance = new Chart(ctx, {
@@ -183,18 +139,11 @@
             });
           });
         }
-
-        // Set default date to today on page load
-        document.addEventListener('DOMContentLoaded', () => {
-          const today = new Date().toISOString().split('T')[0];
-          const dateInput = document.getElementById('logDate');
-          if (dateInput) {
-            dateInput.value = today;
-            dateInput.max = today;
-            loadLogs(); // Load today's logs by default
-          }
-        });
-
+        window.loadLogs = loadLogs;
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+        dateInput.max = today;
+        loadLogs();
       });
     </script>
   </body>
