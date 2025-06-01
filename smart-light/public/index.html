@@ -54,6 +54,8 @@
     <!-- Historical Data -->
     <div style="text-align: center; margin-top: 2em;">
       <h2>Daily Logs</h2>
+      <input type="date" id="logDate" max="" value="">
+      <button onclick="loadLogs()">View Logs</button>
       <canvas id="luxChart" width="600" height="300"></canvas>
     </div>
 
@@ -125,6 +127,74 @@
             }
           });
         });
+        function loadLogs() {
+          const selectedDate = document.getElementById('logDate').value;
+          if (!selectedDate) return;
+
+          firebase.database().ref(`/logs/${selectedDate}`).once('value').then(snapshot => {
+            const logs = snapshot.val();
+            if (!logs) return alert("No logs found for this date.");
+
+            const timestamps = [];
+            const luxValues = [];
+
+            for (const key in logs) {
+              const entry = logs[key];
+              timestamps.push(entry.timestamp || "N/A");
+              luxValues.push(entry.lux || 0);
+            }
+
+            const ctx = document.getElementById('luxChart').getContext('2d');
+            if (window.luxChartInstance) {
+              window.luxChartInstance.destroy(); // Clear previous chart
+            }
+
+            window.luxChartInstance = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: timestamps,
+                datasets: [{
+                  label: `Ambient Lux on ${selectedDate}`,
+                  data: luxValues,
+                  borderColor: 'blue',
+                  backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                  fill: true,
+                  tension: 0.3
+                }]
+              },
+              options: {
+                responsive: true,
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Time'
+                    }
+                  },
+                  y: {
+                    title: {
+                      display: true,
+                      text: 'Lux (Brightness)'
+                    },
+                    beginAtZero: true
+                  }
+                }
+              }
+            });
+          });
+        }
+
+        // Set default date to today on page load
+        document.addEventListener('DOMContentLoaded', () => {
+          const today = new Date().toISOString().split('T')[0];
+          const dateInput = document.getElementById('logDate');
+          if (dateInput) {
+            dateInput.value = today;
+            dateInput.max = today;
+            loadLogs(); // Load today's logs by default
+          }
+        });
+
       });
     </script>
   </body>
