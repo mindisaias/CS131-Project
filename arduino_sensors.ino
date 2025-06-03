@@ -58,10 +58,10 @@ void loop() {
 
     switch(command) { 
 
-      case '0': setRGB(0, 0, 0); break;            
-      case '1': setRGB(255, 255, 255); break;
-      case '2': setRGB(200, 200, 200); break;
-      case '3': setRGB(150, 150, 150); break;
+      case '0': setRGB(0, 0, 0); break;       // Off         
+      case '1': setRGB(0, 0, 255); break;     // Dark Blue
+      case '2': setRGB(255, 165, 0); break;   // Orange/yellow
+      case '3': setRGB(200, 200, 200); break; // Soft white
 
     }
 
