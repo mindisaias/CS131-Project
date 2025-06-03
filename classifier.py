@@ -35,10 +35,21 @@ clf.fit(X, y)
 def classify_scene(motion, light, hour):
     return clf.predict([[motion, light, hour]])[0]
 
-def turn_on_light(level=100):
+def turn_on_light(level):
+    if level >= 100:
+        ser.write(b'1')  # dark  : very bright
+    elif level >= 70:
+        ser.write(b'2')  #  somewhat lit : bright
+    elif level >= 50:
+        ser.write(b'3')  #   lit : less bright 
+    else:
+        ser.write(b'0')   # bright or no motion : off
+        
     print(f"🟡 Light ON at brightness {level}%")
 
+
 def turn_off_light():
+    ser.write(b'0') 
     print("⚫ Light OFF")
 
 # === Main Loop ===

@@ -58,20 +58,13 @@ void loop() {
 
     switch(command) { 
 
-      case '0': // Turn LED off
-        setRGB(0, 0, 0);
-        break;
-      case '1': // Warm orange
-        setRGB(255, 100, 0);
-        break;
-      case '2': // Cool blue
-        setRGB(0, 100, 255);
-        break;
-      case '3': // Soft white
-        setRGB(200, 200, 200);
-        break;
-      // Add more commands as needed
+      case '0': setRGB(0, 0, 0); break;            
+      case '1': setRGB(255, 255, 255); break;
+      case '2': setRGB(200, 200, 200); break;
+      case '3': setRGB(150, 150, 150); break;
+
     }
+
   }
 
   delay(500); // 0.5 sec delay between readings
