@@ -5,7 +5,7 @@ from datetime import datetime
 from sklearn.ensemble import RandomForestClassifier
 
 # Connect to Arduino (adjust /dev/ttyUSB0 if needed)
-ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 time.sleep(2)  # Wait for Arduino to reset
 
 # === Training Data ===
