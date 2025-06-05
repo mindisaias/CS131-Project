@@ -3,6 +3,7 @@ import time
 import numpy as np
 from datetime import datetime
 from sklearn.ensemble import RandomForestClassifier
+from firebase_admin import credentials, db
 
 # Connect to Arduino (adjust /dev/ttyUSB0 if needed)
 ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
@@ -16,7 +17,7 @@ X = np.array([
     [1, 50, 19],
     [1, 15, 22],
     [1, 10, 23],
-    [0, 150, 10]
+    [0, 150, 10],
 ])
 y = [
     'dark room',
