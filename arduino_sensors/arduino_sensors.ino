@@ -61,14 +61,23 @@ void loop() {
       case '0': // Turn LED off
         setRGB(0, 0, 0);
         break;
-      case '1': // Warm orange
-        setRGB(255, 100, 0);
+      case '1': // amber
+        setRGB(255, 191, 0);
         break;
-      case '2': // Cool blue
-        setRGB(0, 100, 255);
+      case '2': // orange/yellow
+        setRGB(255, 200, 0);
         break;
-      case '3': // Soft white
-        setRGB(200, 200, 200);
+      case '3': // soft white
+        setRGB(255, 244, 229);
+        break;
+      case '4': // white
+        setRGB(255, 255, 255);
+        break;
+      case '5': // blue
+        setRGB(0, 0, 255);
+        break;
+      case '6': // dark blue
+        setRGB(0, 0, 139);
         break;
       // Add more commands as needed
     }
