@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/11.8.1/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/11.8.1/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/11.8.1/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/11.8.1/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/11.8.1/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/11.8.1/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/11.8.1/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/11.8.1/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/11.8.1/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/11.8.1/firebase-performance-compat.js"></script>
+    <!-- We use chart.js to visualize the logs that are sent to firebase -->
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+    <body>
+      <!-- Real Time Data -->
+    <div id="dashboard" style="text-align: center; padding: 2em;">
+      <h1>Smart Light System Dashboard</h1>
+      <p><strong>Motion Detected:</strong> <span id="motion">Loading...</span></p>
+      <p><strong>Ambient Light (Lux):</strong> <span id="lux">Loading...</span></p>
+      <p><strong>LED Status:</strong> <span id="led">Loading...</span></p>
+      <p><strong>Color:</strong> <span id="color">Loading...</span></p>
+      <p><strong>Last Update:</strong> <span id="timestamp">Loading...</span></p>
+    </div>
+
+    <!-- Historical Data -->
+    <div style="text-align: center; margin-top: 2em;">
+      <h2>Daily Logs</h2>
+      <input type="date" id="logDate" max="" value="">
+      <button onclick="loadLogs()">View Logs</button>
+      <canvas id="luxChart" width="600" height="300"></canvas>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const motionEl = document.getElementById('motion');
+        const luxEl = document.getElementById('lux');
+        const ledEl = document.getElementById('led');
+        const colorEl = document.getElementById('color');
+        const timestampEl = document.getElementById('timestamp');
+        const dateInput = document.getElementById('logDate');
+
+        // Real-time data
+        firebase.database().ref('/sensor_data').on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            motionEl.textContent = data.motion ? 'Yes' : 'No';
+            luxEl.textContent = data.lux;
+            ledEl.textContent = data.led_status;
+            colorEl.textContent = data.color || 'N/A';
+            timestampEl.textContent = data.timestamp || 'N/A';
+          } else {
+            motionEl.textContent = 'No data';
+          }
+        });
+
+        // Function to load logs for a given date
+        function loadLogs() {
+          const selectedDate = dateInput.value;
+          if (!selectedDate) return;
+
+          firebase.database().ref(`/logs/${selectedDate}`).once('value').then(snapshot => {
+            const logs = snapshot.val();
+            if (!logs) return alert("No logs found for this date.");
+
+            const timestamps = [];
+            const luxValues = [];
+
+            for (const key in logs) {
+              const entry = logs[key];
+              timestamps.push(entry.timestamp || "N/A");
+              luxValues.push(entry.lux || 0);
+            }
+
+            const ctx = document.getElementById('luxChart').getContext('2d');
+            if (window.luxChartInstance) {
+              window.luxChartInstance.destroy();
+            }
+
+            window.luxChartInstance = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: timestamps,
+                datasets: [{
+                  label: `Ambient Lux on ${selectedDate}`,
+                  data: luxValues,
+                  borderColor: 'blue',
+                  backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                  fill: true,
+                  tension: 0.3
+                }]
+              },
+              options: {
+                responsive: true,
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Time'
+                    }
+                  },
+                  y: {
+                    title: {
+                      display: true,
+                      text: 'Lux (Brightness)'
+                    },
+                    beginAtZero: true
+                  }
+                }
+              }
+            });
+          });
+        }
+        window.loadLogs = loadLogs;
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+        dateInput.max = today;
+        loadLogs();
+      });
+    </script>
+  </body>
+</html>

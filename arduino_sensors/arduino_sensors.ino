@@ -74,5 +74,5 @@ void loop() {
     }
   }
 
-  delay(500); // 0.5 sec delay between readings
+  delay(1000); // 0.5 sec delay between readings
 }
