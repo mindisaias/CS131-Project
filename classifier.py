@@ -12,60 +12,89 @@ time.sleep(2)  # Wait for Arduino to reset
 # === Training Data ===
 # Features: [motion, light, hour]
 X = np.array([
-    [0, 5, 21],      # dark room
-    [0, 250, 13],    # daylight
-    [1, 50, 19],     # evening dim
-    [1, 15, 22],     # occupied low
-    [1, 10, 23],     # occupied low
-    [0, 150, 10],    # daylight
-    [1, 5, 2],       # night motion
-    [0, 20, 6],      # low morning
-    [0, 200, 14],    # idle bright
-    [0, 40, 18],     # idle dim
-    [1, 180, 18],    # evening bright
-    [1, 240, 12],    # daylight
-    [1, 30, 5],      # night motion
-    [0, 10, 4],      # dark room
-    [0, 80, 8],      # low morning
-    [1, 120, 9],     # daylight
+    # unoccupied dark
+    [0, 0, 1],
+    [0, 3, 4],
+    [0, 5, 23],
 
-    # More samples
-    [0, 5, 0],       # dark room
-    [1, 20, 1],      # night motion
-    [0, 100, 7],     # morning moderate
-    [1, 30, 7],      # occupied morning
-    [0, 220, 15],    # idle bright
-    [1, 240, 15],    # active afternoon
-    [0, 190, 16],    # idle bright
-    [1, 190, 16],    # active afternoon
-    [0, 60, 17],     # idle dim
-    [1, 60, 17],     # occupied dim
-    [0, 15, 20],     # dark room
-    [1, 15, 20],     # night motion
-    [0, 180, 11],    # daylight
-    [1, 180, 11],    # active daylight
-    [0, 90, 6],      # low morning
-    [1, 90, 6],      # occupied morning
-    [0, 130, 13],    # daylight
-    [1, 130, 13],    # active daylight
-    [0, 0, 3],       # dark room
-    [1, 0, 3],       # night motion
+    # occupied dark (night)
+    [1, 2, 0],
+    [1, 1, 22],
+    [1, 3, 2],
+
+    # occupied dark (day)
+    [1, 5, 10],
+    [1, 4, 8],
+    [1, 2, 18],
+    
+    # unoccupied dim
+    [0, 6, 12],
+    [0, 20, 7],
+    [0, 25, 15],
+
+    # occupied dim (day)
+    [1, 15, 10],
+    [1, 20, 14],
+    [1, 24, 17],
+
+    # occupied dim (night)
+    [1, 10, 23],
+    [1, 12, 1],
+    [1, 18, 4],
+
+    # unoccupied lit
+    [0, 30, 12],
+    [0, 50, 9],
+    [0, 100, 16],
+
+    # occupied lit (day)
+    [1, 45, 13],
+    [1, 70, 11],
+    [1, 90, 17],
+
+    # occupied lit (night)
+    [1, 35, 21],
+    [1, 60, 0],
+    [1, 80, 3],
 ])
 
 y = [
-    # Labels for original samples
-    'dark room', 'daylight', 'evening dim', 'occupied low', 'occupied low', 'daylight',
-    'night motion', 'low morning', 'idle bright', 'idle dim', 'evening bright', 'daylight',
-    'night motion', 'dark room', 'low morning', 'daylight',
+    "unoccupied dark",
+    "unoccupied dark",
+    "unoccupied dark",
 
-    # Labels for new samples
-    'dark room', 'night motion', 'morning moderate', 'occupied morning',
-    'idle bright', 'active afternoon', 'idle bright', 'active afternoon',
-    'idle dim', 'occupied dim', 'dark room', 'night motion',
-    'daylight', 'active daylight', 'low morning', 'occupied morning',
-    'daylight', 'active daylight', 'dark room', 'night motion',
+    "occupied dark (night)",
+    "occupied dark (night)",
+    "occupied dark (night)",
+
+    "occupied dark (day)",
+    "occupied dark (day)",
+    "occupied dark (day)",
+
+    "unoccupied dim",
+    "unoccupied dim",
+    "unoccupied dim",
+
+    "occupied dim (day)",
+    "occupied dim (day)",
+    "occupied dim (day)",
+
+    "occupied dim (night)",
+    "occupied dim (night)",
+    "occupied dim (night)",
+
+    "unoccupied lit",
+    "unoccupied lit",
+    "unoccupied lit",
+
+    "occupied lit (day)",
+    "occupied lit (day)",
+    "occupied lit (day)",
+
+    "occupied lit (night)",
+    "occupied lit (night)",
+    "occupied lit (night)"
 ]
-
 
 # Train model
 clf = RandomForestClassifier()
@@ -105,32 +134,32 @@ while True:
             print(f"[Motion: {motion}, Light: {light:.2f}, Hour: {hour}] → Scene: {scene}")
 
             # === Scene Control Logic ===
-            if scene in ['dark room', 'night motion']:
+            if scene == "occupied dark (night)":
                 ser.write(b'1')  # Full brightness
                 ser.flush()
                 turn_on_light(100)
 
-            elif scene in ['low morning', 'morning moderate', 'occupied morning']:
+            elif scene == "occupied dim (night)":
                 ser.write(b'2')  # Morning setting
                 ser.flush()
                 turn_on_light(60)
 
-            elif scene in ['idle dim', 'evening dim']:
+            elif scene == "occupied lit (night):
                 ser.write(b'3')  # Dim light
                 ser.flush()
                 turn_on_light(40)
 
-            elif scene in ['occupied dim', 'occupied low']:
+            elif scene == "occupied dark (day)":
                 ser.write(b'4')  # Moderate brightness
                 ser.flush()
                 turn_on_light(70)
 
-            elif scene in ['idle bright']:
+            elif scene == "occupied dim (day)":
                 ser.write(b'5')  # Low brightness (not off)
                 ser.flush()
                 turn_on_light(30)
 
-            elif scene in ['evening bright', 'active afternoon', 'active daylight']:
+            elif scene == "occupied lit (day)":
                 ser.write(b'6')  # Moderate brightness
                 ser.flush()
                 turn_on_light(50)
