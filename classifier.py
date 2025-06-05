@@ -53,7 +53,7 @@ X = np.array([
 ])
 
 y = [
-    # Previous labels
+    # Labels for original samples
     'dark room', 'daylight', 'evening dim', 'occupied low', 'occupied low', 'daylight',
     'night motion', 'low morning', 'idle bright', 'idle dim', 'evening bright', 'daylight',
     'night motion', 'dark room', 'low morning', 'daylight',
@@ -104,35 +104,49 @@ while True:
             scene = classify_scene(motion, light, hour)
             print(f"[Motion: {motion}, Light: {light:.2f}, Hour: {hour}] → Scene: {scene}")
 
-            # Send LED control command to Arduino
-            if scene == 'dark room':
-                ser.write(b'1')
-                ser.flush()  # ensure it's sent
+            # === Scene Control Logic ===
+            if scene in ['dark room', 'night motion']:
+                ser.write(b'1')  # Full brightness
+                ser.flush()
                 turn_on_light(100)
 
-            elif scene == 'evening dim':
-                ser.write(b'2')
+            elif scene in ['low morning', 'morning moderate', 'occupied morning']:
+                ser.write(b'2')  # Morning setting
                 ser.flush()
-                turn_on_light(50)
+                turn_on_light(60)
 
-            elif scene == 'occupied low':
-                ser.write(b'3')
+            elif scene in ['idle dim', 'evening dim']:
+                ser.write(b'3')  # Dim light
+                ser.flush()
+                turn_on_light(40)
+
+            elif scene in ['occupied dim', 'occupied low']:
+                ser.write(b'4')  # Moderate brightness
                 ser.flush()
                 turn_on_light(70)
 
-            else:  # scene == 'daylight' or anything else
-                ser.write(b'0')
+            elif scene in ['idle bright']:
+                ser.write(b'5')  # Low brightness (not off)
+                ser.flush()
+                turn_on_light(30)
+
+            elif scene in ['evening bright', 'active afternoon', 'active daylight']:
+                ser.write(b'6')  # Moderate brightness
+                ser.flush()
+                turn_on_light(50)
+
+            else:  # 'daylight' or any other unrecognized scene
+                ser.write(b'0')  # Lights off
                 ser.flush()
                 turn_off_light()
 
-            time.sleep(0.1)  # Give Arduino time to process command
+            time.sleep(0.1)  # Allow Arduino time to process
 
         except ValueError:
             print("Malformed data:", line)
 
-        time.sleep(2)  # Control loop speed
+        time.sleep(2)
 
     except KeyboardInterrupt:
-        print("\n Program stopped by user.")
+        print("\nProgram stopped by user.")
         break
-
