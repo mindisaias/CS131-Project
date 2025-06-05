@@ -135,32 +135,32 @@ while True:
 
             # === Scene Control Logic ===
             if scene == "occupied dark (night)":
-                ser.write(b'1')  # Full brightness
+                ser.write(b'1')  # amber
                 ser.flush()
                 turn_on_light()
 
             elif scene == "occupied dim (night)":
-                ser.write(b'2')  # Morning setting
+                ser.write(b'2')  # orange/yellow
                 ser.flush()
                 turn_on_light()
 
             elif scene == "occupied lit (night):
-                ser.write(b'3')  # Dim light
+                ser.write(b'3')  # soft white
                 ser.flush()
                 turn_on_light()
 
             elif scene == "occupied dark (day)":
-                ser.write(b'4')  # Moderate brightness
+                ser.write(b'4')  # white
                 ser.flush()
                 turn_on_light()
 
             elif scene == "occupied dim (day)":
-                ser.write(b'5')  # Low brightness (not off)
+                ser.write(b'5')  # blue
                 ser.flush()
                 turn_on_light()
 
             elif scene == "occupied lit (day)":
-                ser.write(b'6')  # Moderate brightness
+                ser.write(b'6')  # dark blue
                 ser.flush()
                 turn_on_light()
 
