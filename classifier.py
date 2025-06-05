@@ -104,8 +104,8 @@ clf.fit(X, y)
 def classify_scene(motion, light, hour):
     return clf.predict([[motion, light, hour]])[0]
 
-def turn_on_light(level=100):
-    print(f"🟡 Light ON at brightness {level}%")
+def turn_on_light():
+    print(f"🟡 Light ON")
 
 def turn_off_light():
     print("⚫ Light OFF")
@@ -137,32 +137,32 @@ while True:
             if scene == "occupied dark (night)":
                 ser.write(b'1')  # Full brightness
                 ser.flush()
-                turn_on_light(100)
+                turn_on_light()
 
             elif scene == "occupied dim (night)":
                 ser.write(b'2')  # Morning setting
                 ser.flush()
-                turn_on_light(60)
+                turn_on_light()
 
             elif scene == "occupied lit (night):
                 ser.write(b'3')  # Dim light
                 ser.flush()
-                turn_on_light(40)
+                turn_on_light()
 
             elif scene == "occupied dark (day)":
                 ser.write(b'4')  # Moderate brightness
                 ser.flush()
-                turn_on_light(70)
+                turn_on_light()
 
             elif scene == "occupied dim (day)":
                 ser.write(b'5')  # Low brightness (not off)
                 ser.flush()
-                turn_on_light(30)
+                turn_on_light()
 
             elif scene == "occupied lit (day)":
                 ser.write(b'6')  # Moderate brightness
                 ser.flush()
-                turn_on_light(50)
+                turn_on_light()
 
             else:  # 'daylight' or any other unrecognized scene
                 ser.write(b'0')  # Lights off
