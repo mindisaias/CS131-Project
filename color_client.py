@@ -18,15 +18,25 @@ JETSON_PORT = 65432
 led = RGBLED(red=17, green=27, blue=22)
 
 def color_name_to_rgb(color_name):
-    # Map color strings to RGB values (0-1)
-    if color_name == 'dark blue':
-        return (0, 0, 1)      # Blue
-    elif color_name == 'orange/yellow':
-        return (1, 0.5, 0)    # Orange-ish
+    # Map color strings to RGB values (0.0–1.0) using basic conditionals
+    if color_name == 'off':
+        return (0.0, 0.0, 0.0)
     elif color_name == 'white':
-        return (1, 1, 1)      # White
+        return (1.0, 1.0, 1.0)
+    elif color_name == 'amber':
+        return (1.0, 0.5, 0.1)
+    elif color_name == 'blue':
+        return (0.0, 0.0, 1.0)
+    elif color_name == 'orange/yellow':
+        return (1.0, 0.65, 0.0)
+    elif color_name == 'dark blue':
+        return (0.0, 0.0, 0.3)
+    elif color_name == 'soft white':
+        return (0.9, 0.85, 0.8)
+    elif color_name == 'unknown error occurred':
+        return (1.0, 0.0, 1.0)  # bright magenta as a visual warning
     else:
-        return (0, 0, 0)      # Off / unknown
+        return (0.0, 0.0, 0.0)  # default to off if unrecognized
 
 def smooth_transition(current_rgb, target_rgb, duration=2.0, steps=50):
     """
