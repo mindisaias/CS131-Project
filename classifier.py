@@ -184,7 +184,7 @@ while True:
                 ser.write(b'0')  # Lights off
                 ser.flush()
                 turn_off_light()
-                data[color] = "OFF"
+                data["color"] = "OFF"
 
             firebase.push_data_to_firebase(data)
             time.sleep(0.1)  # Allow Arduino time to process
