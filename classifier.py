@@ -144,7 +144,7 @@ while True:
                 ser.flush()
                 turn_on_light()
 
-            elif scene == "occupied lit (night):
+            elif scene == "occupied lit (night)":
                 ser.write(b'3')  # soft white
                 ser.flush()
                 turn_on_light()
