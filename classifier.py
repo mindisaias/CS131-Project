@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime
 from sklearn.ensemble import RandomForestClassifier
 from firebase_admin import credentials, db
+import firebase
 
 # Connect to Arduino (adjust /dev/ttyUSB0 if needed)
 ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
@@ -133,42 +134,59 @@ while True:
             scene = classify_scene(motion, light, hour)
             print(f"[Motion: {motion}, Light: {light:.2f}, Hour: {hour}] → Scene: {scene}")
 
+            data = {
+                'device': 'arduino',
+                'motion': motion,
+                'lux': light,
+                'scene': scene,
+                'color': "N/A",
+                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+
             # === Scene Control Logic ===
             if scene == "occupied dark (night)":
                 ser.write(b'1')  # amber
                 ser.flush()
                 turn_on_light()
+                data.color = "amber"
 
             elif scene == "occupied dim (night)":
                 ser.write(b'2')  # orange/yellow
                 ser.flush()
                 turn_on_light()
+                data.color = "orange/yellow"
 
-            elif scene == "occupied lit (night):
+            elif scene == "occupied lit (night)":
                 ser.write(b'3')  # soft white
                 ser.flush()
                 turn_on_light()
+                data.color = "soft white"
 
             elif scene == "occupied dark (day)":
                 ser.write(b'4')  # white
                 ser.flush()
                 turn_on_light()
+                data.color = "white"
 
             elif scene == "occupied dim (day)":
                 ser.write(b'5')  # blue
                 ser.flush()
                 turn_on_light()
+                data.color = "blue"
 
             elif scene == "occupied lit (day)":
                 ser.write(b'6')  # dark blue
                 ser.flush()
                 turn_on_light()
+                data.color = "dark blue"
 
             else:  # 'daylight' or any other unrecognized scene
                 ser.write(b'0')  # Lights off
                 ser.flush()
                 turn_off_light()
+                data.color = "OFF"
 
+            firebase.push_data_to_firebase(data)
             time.sleep(0.1)  # Allow Arduino time to process
 
         except ValueError:
