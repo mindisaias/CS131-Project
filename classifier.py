@@ -148,43 +148,43 @@ while True:
                 ser.write(b'1')  # amber
                 ser.flush()
                 turn_on_light()
-                data.color = "amber"
+                data["color"] = "amber"
 
             elif scene == "occupied dim (night)":
                 ser.write(b'2')  # orange/yellow
                 ser.flush()
                 turn_on_light()
-                data.color = "orange/yellow"
+                data["color"] = "orange/yellow"
 
             elif scene == "occupied lit (night)":
                 ser.write(b'3')  # soft white
                 ser.flush()
                 turn_on_light()
-                data.color = "soft white"
+                data["color"] = "soft white"
 
             elif scene == "occupied dark (day)":
                 ser.write(b'4')  # white
                 ser.flush()
                 turn_on_light()
-                data.color = "white"
+                data["color"] = "white"
 
             elif scene == "occupied dim (day)":
                 ser.write(b'5')  # blue
                 ser.flush()
                 turn_on_light()
-                data.color = "blue"
+                data["color"] = "blue"
 
             elif scene == "occupied lit (day)":
                 ser.write(b'6')  # dark blue
                 ser.flush()
                 turn_on_light()
-                data.color = "dark blue"
+                data["color"] = "dark blue"
 
             else:  # 'daylight' or any other unrecognized scene
                 ser.write(b'0')  # Lights off
                 ser.flush()
                 turn_off_light()
-                data.color = "OFF"
+                data[color] = "OFF"
 
             firebase.push_data_to_firebase(data)
             time.sleep(0.1)  # Allow Arduino time to process
